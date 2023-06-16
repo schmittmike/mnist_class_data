@@ -1,0 +1,13 @@
+c/image_process/images
+c/data/mnist
+*.dat
+*.swp
+*.swo
+*.o
+*.tiff
+read_write_image
+validate_ones_zeros
+randomize
+randomize.txt
+randomize_test.txt
+randomize_train.txt
