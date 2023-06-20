@@ -14,3 +14,5 @@ the files to be read/manipulated. The MNIST data set should be placed in
 "c/data/mnist"
 
 get MNIST dataset files here: http://yann.lecun.com/exdb/mnist/
+
+Isaac was here
