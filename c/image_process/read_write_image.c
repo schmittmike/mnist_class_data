@@ -134,6 +134,18 @@ float sum(float data[], int n)
 }
 
 
+int get_mnist_item_count(FILE *stream)
+{
+        int n = 0;
+        /* go to 0th item */
+        fseek(stream, 8, SEEK_SET);
+        while(fgetc(stream) != EOF) {
+                n++;
+        }
+
+        return n;
+}
+
 /* this func does the heavy lifting math wise:
  * populates Stats struct with stats for image selected.
  * assumes that rgb values are all the same, uses r. */
@@ -223,7 +235,6 @@ void generate_output_label_string(char *string, int output_count, int label_pos)
  */
 void record_stats_for_label_bitfield(FILE *image_stream,
 				     FILE *label_stream,
-				     int bool_stream_is_test_data,
 				     unsigned int label_bitfield,
 				     const char *filename)
 {
@@ -240,11 +251,7 @@ void record_stats_for_label_bitfield(FILE *image_stream,
 		exit(1);
 	}
 
-	if (bool_stream_is_test_data) {
-		line_count = TEST_SET_EXAMPLES;
-	} else {
-		line_count = TRAIN_SET_EXAMPLES;
-	}
+        line_count = get_mnist_item_count(label_stream);
 
 	printf("[INFO] generating %s file in current directory\n", filename);
 	for (i = 0; i < line_count; i++) {
@@ -295,8 +302,8 @@ int main(int argc, char **argv)
 	FILE *train_labels = fopen(MNIST_TRAIN_LABELS, "r");
 
 	//generate_all_one_and_zero_ppm(data, test_images, test_labels);
-	record_stats_for_label_bitfield(train_images, train_labels, 0, LABELS_IN_USE, "stat_train.dat");
-	record_stats_for_label_bitfield(test_images, test_labels, 1, LABELS_IN_USE, "stat_test.dat");
+	record_stats_for_label_bitfield(train_images, train_labels, LABELS_IN_USE, "stat_train.dat");
+	record_stats_for_label_bitfield(test_images, test_labels, LABELS_IN_USE, "stat_test.dat");
 
 	fclose(test_images);
 	fclose(test_labels);

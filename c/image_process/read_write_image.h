@@ -97,7 +97,6 @@ void generate_output_label_string(char *string, int output_count, int label_pos)
 
 void record_stats_for_label_bitfield(FILE *image_stream,
 				     FILE *label_stream,
-                                     int bool_stream_is_test_data,
                                      unsigned int label_bitfield,
 				     const char *filename);
 

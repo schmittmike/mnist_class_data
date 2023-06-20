@@ -1,5 +1,5 @@
 c/image_process/images
-c/data/mnist
+c/data/
 *.dat
 *.swp
 *.swo
