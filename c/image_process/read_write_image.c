@@ -205,21 +205,31 @@ void stats_from_nth_image(struct Stats *s,
  *  for output true label = 1, string = "0	1	0"
  *  for output true label = 2, string = "0	0	1"
  */
-void generate_output_label_string(char *string, int output_count, int label_pos)
+void generate_output_label_string(char *string, unsigned int label_bitfield, int label_pos)
 {
 	int i;
-	/* increment by label and tab (2 chars) */
-	for (i = 0; i < output_count; i++) {
-		if (i == label_pos) { // *2 to line up with i+=2
-			string[i*2] = '1';
-			string[i*2+1] = '\t';
-		} else {
-			string[i*2] = '0';
-			string[i*2+1] = '\t';
-		}
+        int positon = 0;
+
+	/* increment by label and tab (2 chars)
+         * moves thru only the relevant bits */
+	for (i = 0; i <= LABEL_COUNT_MAX; i++) {
+
+                /* only add a label if theres a spot for it in the bitfield */
+		if ((1<<i) & label_bitfield) {
+                        if (i == label_pos) {
+                                // "i*2" to line up w label and tab
+                                string[positon*2] = '1';
+                                string[positon*2+1] = '\t';
+                                positon++;
+                        } else {
+                                string[positon*2] = '0';
+                                string[positon*2+1] = '\t';
+                                positon++;
+                        }
+                }
 	}
 	/* get rid of last tab, (trailing whitespace in output) */
-	string[i*2-1] = '\0';
+	string[positon*2-1] = '\0';
 }
 
 
@@ -252,6 +262,7 @@ void record_stats_for_label_bitfield(FILE *image_stream,
 	}
 
         line_count = get_mnist_item_count(label_stream);
+	if (DEBUG_OVERRIDE_LINE_COUNT) line_count = DEBUG_OVERRIDE_LINE_COUNT;
 
 	printf("[INFO] generating %s file in current directory\n", filename);
 	for (i = 0; i < line_count; i++) {
@@ -259,7 +270,7 @@ void record_stats_for_label_bitfield(FILE *image_stream,
 		/* check bitfield for each this label */
 		if ((unsigned int)((1u << ret) & label_bitfield) > 0) {
 			stats_from_nth_image(&s, image_stream, label_stream, i);
-			generate_output_label_string(label_string, LABEL_COUNT, s.label);
+			generate_output_label_string(label_string, LABELS_IN_USE, s.label);
 
 			sprintf(line, "%f\t%f\t%d\t%s\n",
 						s.column_stddev_sum,
